@@ -8,15 +8,21 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "subgraphmatching/matching.h"
-#include "util/CLI11.hpp"
-
-
-int main(int argc, char **argv) {
+#ifndef MULTISUBGRAPHMATCHING_UTILS_H
+#define MULTISUBGRAPHMATCHING_UTILS_H
 
 
 
 
-}
 
 
+
+
+
+
+
+
+
+
+
+#endif //MULTISUBGRAPHMATCHING_UTILS_H

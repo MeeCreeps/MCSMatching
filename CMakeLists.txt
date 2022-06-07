@@ -10,10 +10,13 @@ include_directories(src)
 
 
 
+
 file(GLOB_RECURSE ALL_SRCS "*.h" "*.cpp")
 add_library(SRCS STATIC ${ALL_SRCS}  )
 include_directories(${ALL_SRCS})
 
 
-add_executable(Matching src/main.cpp )
+
+AUX_SOURCE_DIRECTORY(./src DIR_SRCS)
+add_executable(Matching ${DIR_SRCS} )
 target_link_libraries(Matching SRCS)
