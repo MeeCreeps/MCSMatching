@@ -60,9 +60,10 @@ public:
 
     void LoadGraphByFile(std::string &graph_path);
 
-    void LoadStreamByFile(std::string &stream_path);
-    friend class Shuffle;
-    friend class Query;
+    void Dump(std::string &graph_path);
+
+    friend class Generator;
+
 protected:
     std::vector<label_type> vertex_label_;
     std::vector<std::vector<uint32_t>> neighbors_;

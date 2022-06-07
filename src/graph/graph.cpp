@@ -47,3 +47,23 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
     infile.close();
 
 }
+
+void Graph::Dump(std::string &graph_path) {
+    std::ofstream output(graph_path);
+
+    // v: vertex  e: edge(dst,src,type)
+    //first line   vertex nums   edge nums
+    output << vertex_nums_ << " " << edge_nums_ << "\n";
+    // second line  the size of vertex label , the size of edge label
+    output << vertex_label_type_nums_ << " " << edge_label_type_nums_ << "\n";
+    for (uint32_t vertex = 0; vertex < vertex_label_.size(); ++vertex) {
+        output << "v" << " " << vertex << " " << vertex_label_[vertex] << "\n";
+    }
+    for (uint32_t src = 0; src < neighbors_.size(); ++src) {
+        for (uint32_t idx = 0; idx < neighbors_[src].size(); ++idx) {
+            output << "e" << src << " " << neighbors_[src][idx] << " "
+                   << edge_label_[src][idx];
+        }
+    }
+    output.close();
+}

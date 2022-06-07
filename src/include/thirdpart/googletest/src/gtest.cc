@@ -272,7 +272,7 @@ GTEST_DEFINE_bool_(
 
 GTEST_DEFINE_bool_(
     shuffle,
-    internal::BoolFromGTestEnv("shuffle", false),
+    internal::BoolFromGTestEnv("generator", false),
     "True iff " GTEST_NAME_
     " should randomize tests' order on every run.");
 
@@ -306,7 +306,7 @@ GTEST_DEFINE_string_(
 namespace internal {
 
 // Generates a random number from [0, range), using a Linear
-// Congruential Generator (LCG).  Crashes if 'range' is 0 or greater
+// Congruential generator (LCG).  Crashes if 'range' is 0 or greater
 // than kMaxRange.
 UInt32 Random::Generate(UInt32 range) {
   // These constants are the same as are used in glibc's rand(3).
@@ -2794,7 +2794,7 @@ void TestCase::ShuffleTests(internal::Random* random) {
   Shuffle(random, &test_indices_);
 }
 
-// Restores the test order to before the first shuffle.
+// Restores the test order to before the first generator.
 void TestCase::UnshuffleTests() {
   for (size_t i = 0; i < test_indices_.size(); i++) {
     test_indices_[i] = static_cast<int>(i);
@@ -4670,7 +4670,7 @@ bool UnitTestImpl::RunAllTests() {
     // Restores the original test order after the iteration.  This
     // allows the user to quickly repro a failure that happens in the
     // N-th iteration without repeating the first (N - 1) iterations.
-    // This is not enclosed in "if (GTEST_FLAG(shuffle)) { ... }", in
+    // This is not enclosed in "if (GTEST_FLAG(generator)) { ... }", in
     // case the user somehow changes the value of the flag somewhere
     // (it's always safe to unshuffle the tests).
     UnshuffleTests();
@@ -4950,7 +4950,7 @@ void UnitTestImpl::ShuffleTests() {
   }
 }
 
-// Restores the test cases and tests to their order before the first shuffle.
+// Restores the test cases and tests to their order before the first generator.
 void UnitTestImpl::UnshuffleTests() {
   for (size_t i = 0; i < test_cases_.size(); i++) {
     // Unshuffles the tests in each test case.
@@ -5175,7 +5175,7 @@ static const char kColorEncodedHelpMessage[] =
 "Test Execution:\n"
 "  @G--" GTEST_FLAG_PREFIX_ "repeat=@Y[COUNT]@D\n"
 "      Run the tests repeatedly; use a negative count to repeat forever.\n"
-"  @G--" GTEST_FLAG_PREFIX_ "shuffle@D\n"
+"  @G--" GTEST_FLAG_PREFIX_ "generator@D\n"
 "      Randomize tests' orders on every iteration.\n"
 "  @G--" GTEST_FLAG_PREFIX_ "random_seed=@Y[NUMBER]@D\n"
 "      Random number seed to use for shuffling test orders (between 1 and\n"

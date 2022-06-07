@@ -177,7 +177,7 @@ void VerifyGeneratorIsEmpty(const ParamGenerator<T>& generator) {
   EXPECT_TRUE(it == generator.end());
 }
 
-// Generator tests. They test that each of the provided generator functions
+// generator tests. They test that each of the provided generator functions
 // generates an expected sequence of values. The general test pattern
 // instantiates a generator using one of the generator functions,
 // checks the sequence produced by the generator using its iterator API,
@@ -721,7 +721,7 @@ INSTANTIATE_TEST_CASE_P(GenEvalModule,
                         Values(GeneratorEvaluationTest::param_value()));
 
 // Tests that generators defined in a different translation unit are
-// functional. Generator extern_gen is defined in gtest-param-test_test2.cc.
+// functional. generator extern_gen is defined in gtest-param-test_test2.cc.
 extern ParamGenerator<int> extern_gen;
 class ExternalGeneratorTest : public TestWithParam<int> {};
 TEST_P(ExternalGeneratorTest, ExternalGenerator) {

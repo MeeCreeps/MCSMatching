@@ -169,7 +169,7 @@ class ParamGeneratorInterface {
 
   virtual ~ParamGeneratorInterface() {}
 
-  // Generator interface definition
+  // generator interface definition
   virtual ParamIteratorInterface<T>* Begin() const = 0;
   virtual ParamIteratorInterface<T>* End() const = 0;
 };

@@ -815,16 +815,16 @@ TEST(ContainerUtilityDeathTest, ShuffleRange) {
 
   EXPECT_DEATH_IF_SUPPORTED(
       ShuffleRange(&random, -1, 1, &a),
-      "Invalid shuffle range start -1: must be in range \\[0, 3\\]");
+      "Invalid generator range start -1: must be in range \\[0, 3\\]");
   EXPECT_DEATH_IF_SUPPORTED(
       ShuffleRange(&random, 4, 4, &a),
-      "Invalid shuffle range start 4: must be in range \\[0, 3\\]");
+      "Invalid generator range start 4: must be in range \\[0, 3\\]");
   EXPECT_DEATH_IF_SUPPORTED(
       ShuffleRange(&random, 3, 2, &a),
-      "Invalid shuffle range finish 2: must be in range \\[3, 3\\]");
+      "Invalid generator range finish 2: must be in range \\[3, 3\\]");
   EXPECT_DEATH_IF_SUPPORTED(
       ShuffleRange(&random, 3, 4, &a),
-      "Invalid shuffle range finish 4: must be in range \\[3, 3\\]");
+      "Invalid generator range finish 4: must be in range \\[3, 3\\]");
 }
 
 class VectorShuffleTest : public Test {
@@ -936,7 +936,7 @@ TEST_F(VectorShuffleTest, ShufflesEntireVector) {
   EXPECT_FALSE(VectorIsUnshuffled(vector_)) << vector_;
 
   // Tests the first and last elements in particular to ensure that
-  // there are no off-by-one problems in our shuffle algorithm.
+  // there are no off-by-one problems in our generator algorithm.
   EXPECT_NE(0, vector_[0]);
   EXPECT_NE(kVectorSize - 1, vector_[kVectorSize - 1]);
 }

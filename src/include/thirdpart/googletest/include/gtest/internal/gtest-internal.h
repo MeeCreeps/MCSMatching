@@ -744,7 +744,7 @@ struct GTEST_API_ ConstCharPtr {
   const char* value;
 };
 
-// A simple Linear Congruential Generator for generating random
+// A simple Linear Congruential generator for generating random
 // numbers with a uniform distribution.  Unlike rand() and srand(), it
 // doesn't use global state (and therefore can't interfere with user
 // code).  Unlike rand_r(), it's portable.  An LCG isn't very random,

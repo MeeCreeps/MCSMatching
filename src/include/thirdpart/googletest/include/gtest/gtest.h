@@ -924,7 +924,7 @@ class GTEST_API_ TestCase {
   // Shuffles the tests in this test case.
   void ShuffleTests(internal::Random* random);
 
-  // Restores the test order to before the first shuffle.
+  // Restores the test order to before the first generator.
   void UnshuffleTests();
 
   // Name of the test case.

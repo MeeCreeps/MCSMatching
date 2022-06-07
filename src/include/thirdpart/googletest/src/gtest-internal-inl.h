@@ -96,7 +96,7 @@ const char kOutputFlag[] = "output";
 const char kPrintTimeFlag[] = "print_time";
 const char kRandomSeedFlag[] = "random_seed";
 const char kRepeatFlag[] = "repeat";
-const char kShuffleFlag[] = "shuffle";
+const char kShuffleFlag[] = "generator";
 const char kStackTraceDepthFlag[] = "stack_trace_depth";
 const char kStreamResultToFlag[] = "stream_result_to";
 const char kThrowOnFailureFlag[] = "throw_on_failure";
@@ -304,22 +304,22 @@ inline E GetElementOr(const std::vector<E>& v, int i, E default_value) {
   return (i < 0 || i >= static_cast<int>(v.size())) ? default_value : v[i];
 }
 
-// Performs an in-place shuffle of a range of the vector's elements.
+// Performs an in-place generator of a range of the vector's elements.
 // 'begin' and 'end' are element indices as an STL-style range;
 // i.e. [begin, end) are shuffled, where 'end' == size() means to
-// shuffle to the end of the vector.
+// generator to the end of the vector.
 template <typename E>
 void ShuffleRange(internal::Random* random, int begin, int end,
                   std::vector<E>* v) {
   const int size = static_cast<int>(v->size());
   GTEST_CHECK_(0 <= begin && begin <= size)
-      << "Invalid shuffle range start " << begin << ": must be in range [0, "
+      << "Invalid generator range start " << begin << ": must be in range [0, "
       << size << "].";
   GTEST_CHECK_(begin <= end && end <= size)
-      << "Invalid shuffle range finish " << end << ": must be in range ["
+      << "Invalid generator range finish " << end << ": must be in range ["
       << begin << ", " << size << "].";
 
-  // Fisher-Yates shuffle, from
+  // Fisher-Yates generator, from
   // http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
   for (int range_width = end - begin; range_width >= 2; range_width--) {
     const int last_in_range = begin + range_width - 1;
@@ -328,7 +328,7 @@ void ShuffleRange(internal::Random* random, int begin, int end,
   }
 }
 
-// Performs an in-place shuffle of the vector's elements.
+// Performs an in-place generator of the vector's elements.
 template <typename E>
 inline void Shuffle(internal::Random* random, std::vector<E>* v) {
   ShuffleRange(random, 0, static_cast<int>(v->size()), v);
@@ -795,7 +795,7 @@ class GTEST_API_ UnitTestImpl {
   // making sure that death tests are still run first.
   void ShuffleTests();
 
-  // Restores the test cases and tests to their order before the first shuffle.
+  // Restores the test cases and tests to their order before the first generator.
   void UnshuffleTests();
 
   // Returns the value of GTEST_FLAG(catch_exceptions) at the moment

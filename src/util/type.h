@@ -25,6 +25,13 @@ struct StreamUint{
 };
 
 
+struct QueryLimit{
+    int max_edge_nums;
+    int min_edge_nums;
+
+};
+
+
 
 
 
