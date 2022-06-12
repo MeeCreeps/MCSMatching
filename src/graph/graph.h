@@ -25,7 +25,7 @@
 class Graph {
 
 public:
-    Graph();
+    Graph() : edge_nums_(0), vertex_nums_(0) {};
 
     void AddEdge(uint32_t src, uint32_t dst, label_type label);
 
@@ -43,20 +43,25 @@ public:
 
     uint32_t GeVertexLabelNums() { return vertex_label_type_nums_; }
 
-    uint32_t GetDegree(uint32_t vertex){
+    uint32_t GetDegree(uint32_t vertex) {
         return neighbors_[vertex].size();
     }
 
 
-    label_type GetVertexLabel(uint32_t vertex);
+    label_type GetVertexLabel(uint32_t vertex) { return vertex_label_[vertex]; }
 
-    label_type GetEdgeLabel(uint32_t src,uint32_t dst);
+    label_type GetEdgeLabel(uint32_t src, uint32_t dst) {
+        return edge_label_[src][dst];
+    };
 
-    std::vector<uint32_t> GetNeighbors(uint32_t vertex);
+    std::vector<uint32_t> GetNeighbors(uint32_t vertex) {
+        return neighbors_[vertex];
+    };
 
-    std::vector<label_type> GetNeighborLabels(uint32_t vertex);
+    std::vector<label_type> GetNeighborLabels(uint32_t vertex) {
+        return;
+    };
 
-    
 
     void LoadGraphByFile(std::string &graph_path);
 
@@ -64,8 +69,10 @@ public:
 
     friend class Generator;
 
+
 protected:
     std::vector<label_type> vertex_label_;
+    // sorted by id
     std::vector<std::vector<uint32_t>> neighbors_;
     std::vector<std::vector<label_type>> edge_label_;
     uint32_t vertex_nums_;
@@ -76,8 +83,6 @@ protected:
     // the number of instance of each type
     std::map<label_type, size_t> each_edge_label_type_num_;
     std::map<label_type, size_t> each_vertex_label_type_num_;
-
-
 
 
 };
