@@ -69,7 +69,7 @@ public:
     void Dump(std::string &graph_path);
 
     friend class Generator;
-
+    friend class Analysis;
 
 protected:
     std::vector<label_type> vertex_label_;

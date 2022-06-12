@@ -9,6 +9,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "subgraphmatching/matching.h"
+#include "analysis/analysis.h"
 #include "util/CLI11.hpp"
 
 

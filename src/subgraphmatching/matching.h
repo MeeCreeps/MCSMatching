@@ -6,8 +6,9 @@
 #include "graph/graph.h"
 #include "graph/streaming.h"
 
-
+#include <unordered_map>
 #include <vector>
+
 
 class Matching {
 
@@ -26,9 +27,11 @@ public:
 
 
 protected:
+
     Graph &data_graph_;
     std::vector<Graph> &query_graph_;
     Streaming &streaming_;
+
 
 };
 
