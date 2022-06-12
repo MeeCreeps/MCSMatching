@@ -12,6 +12,8 @@
 #define MULTISUBGRAPHMATCHING_SHUFFLE_H
 
 #include "graph/graph.h"
+#include "graph/streaming.h"
+
 #include <queue>
 #include <random>
 #include <time.h>
@@ -42,18 +44,19 @@ public:
     virtual void GenerateQueries(int query_nums, QueryLimit limit);
 
 
-    void StreamDump();
+
 
 
 protected:
     Graph data_graph_;
+    Streaming stream_;
     // the origin data graph
     std::string graph_path_before_;
     // divide the origin data graph into streaming and data graph
     std::string data_graph_path_;
     std::string stream_path_;
     std::string query_path_prefix_;
-    std::queue<StreamUint> streaming_;
+
 
 };
 

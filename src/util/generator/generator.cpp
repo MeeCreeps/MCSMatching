@@ -11,24 +11,6 @@
 #include "generator.h"
 
 
-void Generator::StreamDump() {
-
-    std::ofstream output(stream_path_);
-
-    output << streaming_.size() << "\n";
-    // format :  i/d  src  src_label  dst dst_label edge_label
-    while (!streaming_.empty()) {
-        StreamUint operate = streaming_.front();
-        streaming_.pop();
-        if (operate.is_insert)
-            output << "i" << " ";
-        else
-            output << "d" << " ";
-        output << operate.src << " " << operate.src_label << " " << operate.dst << " " << operate.dst_label << " "
-               << operate.edge_label << "\n";
-    }
-    output.close();
-}
 
 
 void Generator::GenerateStreaming(int streaming_size) {
@@ -41,7 +23,7 @@ void Generator::GenerateStreaming(int streaming_size) {
     for (int i = 0; i < data_graph_.neighbors_.size(); ++i)
         degree[i] = data_graph_.neighbors_[i].size();
     uint32_t max_id = data_graph_.vertex_label_.size();
-    while (streaming_.size() < streaming_size) {
+    while (stream_.GetSize() < streaming_size) {
         uint32_t vertex1 = rand() % max_id;
         if (degree[vertex1] <= 1)
             continue;
@@ -53,13 +35,16 @@ void Generator::GenerateStreaming(int streaming_size) {
         degree[vertex2] -= 1;
         data_graph_.neighbors_[vertex1][vertex2] = NON_EXIST;
         data_graph_.neighbors_[vertex2][vertex1] = NON_EXIST;
-        streaming_.push(StreamUint{true, vertex1, data_graph_.vertex_label_[vertex1], vertex2,
-                                   data_graph_.vertex_label_[vertex2], data_graph_.edge_label_[vertex1][vertex2]});
+        stream_.Push(Streaming::StreamUint{true, vertex1, data_graph_.vertex_label_[vertex1], vertex2,
+                                           data_graph_.vertex_label_[vertex2],
+                                           data_graph_.edge_label_[vertex1][vertex2]});
     }
 
     // rewrite graph
-
     data_graph_.Dump(data_graph_path_);
+
+    // write stream
+    stream_.Dump(stream_path_);
 
 
 }
@@ -87,7 +72,7 @@ void Generator::GenerateQueries(int query_nums, QueryLimit limit) {
         int edges_num = rand() % limit.max_edge_nums + limit.min_edge_nums;
 
 
-        uint32_t query_v1 = 0, query_v2, vertex2,vertex_size = 0, j = 0;
+        uint32_t query_v1 = 0, query_v2, vertex2, vertex_size = 0, j = 0;
         uint32_t vertex1 = rand() % data_graph_.vertex_nums_;
         // insert vertex1
         data_id_to_query_id.insert({vertex1, query_v1});
@@ -108,7 +93,7 @@ void Generator::GenerateQueries(int query_nums, QueryLimit limit) {
                 query_v2 = data_id_to_query_id[vertex2];
             // check whether edge is already exist
             bool edge_not_exist = true;
-            for (auto &v:query_graph.neighbors_[query_v1]) {
+            for (auto &v: query_graph.neighbors_[query_v1]) {
                 if (v == query_v2) {
                     edge_not_exist = false;
                     break;

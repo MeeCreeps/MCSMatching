@@ -59,11 +59,12 @@ public:
     };
 
     std::vector<label_type> GetNeighborLabels(uint32_t vertex) {
-        return;
+
     };
 
 
     void LoadGraphByFile(std::string &graph_path);
+
 
     void Dump(std::string &graph_path);
 

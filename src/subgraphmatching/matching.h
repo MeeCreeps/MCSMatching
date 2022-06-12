@@ -4,19 +4,21 @@
 #define MCSMATCHING_MATCHING_H
 
 #include "graph/graph.h"
-#include <queue>
+#include "graph/streaming.h"
+
+
 #include <vector>
 
 class Matching {
 
 public:
-    Matching(Graph &data_graph, std::vector<Graph> &query_graph, std::queue<StreamUint> &streaming) : data_graph_(
+    Matching(Graph &data_graph, std::vector<Graph> &query_graph, Streaming &streaming) : data_graph_(
             data_graph), query_graph_(query_graph), streaming_(streaming) {
 
     }
 
 
-    virtual void Init() {}
+    virtual void Init();
 
     virtual void InitialMatching() {}
 
@@ -26,7 +28,7 @@ public:
 protected:
     Graph &data_graph_;
     std::vector<Graph> &query_graph_;
-    std::queue<StreamUint> &streaming_;
+    Streaming &streaming_;
 
 };
 
