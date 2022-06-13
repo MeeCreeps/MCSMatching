@@ -11,8 +11,6 @@
 #include "generator.h"
 
 
-
-
 void Generator::GenerateStreaming(int streaming_size) {
 
     // generate streaming by removing edges randomly
@@ -27,17 +25,21 @@ void Generator::GenerateStreaming(int streaming_size) {
         uint32_t vertex1 = rand() % max_id;
         if (degree[vertex1] <= 1)
             continue;
-        uint32_t vertex2 = data_graph_.neighbors_[vertex1][rand() % data_graph_.neighbors_[vertex1].size()];
-        if (data_graph_.neighbors_[vertex1][vertex2] == NON_EXIST)
+        int idx = rand() % data_graph_.neighbors_[vertex1].size();
+        uint32_t vertex2 = data_graph_.neighbors_[vertex1][idx];
+        if (data_graph_.neighbors_[vertex1][idx] == NON_EXIST)
             continue;
 
         degree[vertex1] -= 1;
         degree[vertex2] -= 1;
-        data_graph_.neighbors_[vertex1][vertex2] = NON_EXIST;
-        data_graph_.neighbors_[vertex2][vertex1] = NON_EXIST;
+        data_graph_.neighbors_[vertex1][idx] = NON_EXIST;
+        for (auto &v:data_graph_.neighbors_[vertex2]) {
+            if (v == vertex1)
+                v = NON_EXIST;
+        }
         stream_.Push(Streaming::StreamUint{true, vertex1, data_graph_.vertex_label_[vertex1], vertex2,
                                            data_graph_.vertex_label_[vertex2],
-                                           data_graph_.edge_label_[vertex1][vertex2]});
+                                           data_graph_.edge_label_[vertex1][idx]});
     }
 
     // rewrite graph
@@ -54,7 +56,8 @@ void Generator::GenerateQueries(int query_nums, QueryLimit limit) {
 
     // sort by avg degree of query graph
     struct q_degree {
-        int query_id;
+        size_t query_id;
+        int edge_nums;
         float degree;
 
         bool operator<(const q_degree &rhs) const {
@@ -69,55 +72,66 @@ void Generator::GenerateQueries(int query_nums, QueryLimit limit) {
     while (queries.size() < query_nums * QUERY_GENERATOR_RATE) {
         Graph query_graph;
         std::unordered_map<uint32_t, uint32_t> data_id_to_query_id;
-        int edges_num = rand() % limit.max_edge_nums + limit.min_edge_nums;
+        std::vector<uint32_t> vertices;
+        int edges_num = rand() % (limit.max_edge_nums - limit.min_edge_nums) + limit.min_edge_nums;
 
 
-        uint32_t query_v1 = 0, query_v2, vertex2, vertex_size = 0, j = 0;
-        uint32_t vertex1 = rand() % data_graph_.vertex_nums_;
+        uint32_t query_v1 = 0, query_v2, vertex2, vertex1, vertex_size = 1;
+
+        vertex1 = rand() % data_graph_.vertex_nums_;
+        while (data_graph_.neighbors_[vertex1].size() == 0) {
+            vertex1 = rand() % data_graph_.vertex_nums_;
+
+        }
+        vertices.push_back(vertex1);
         // insert vertex1
         data_id_to_query_id.insert({vertex1, query_v1});
-        query_graph.AddVertex(vertex1, data_graph_.vertex_label_[vertex1]);
+        query_graph.AddVertex(query_v1, data_graph_.vertex_label_[vertex1]);
 
-        while (j < edges_num) {
+        int delay = 0, edges_before = 0;
+        while (query_graph.edge_nums_ < edges_num && delay < 3) {
+
+            vertex1 = vertices[rand() % vertices.size()];
+            query_v1 = data_id_to_query_id[vertex1];
             // visit neighbor
             vertex2 = data_graph_.neighbors_[vertex1][rand() % data_graph_.neighbors_[vertex1].size()];
-            // return if  leaf edge
-            if (data_graph_.neighbors_[vertex2].size() <= 1)
-                break;
+            if (vertex1 == vertex2) {
+                delay++;
+                continue;
+            }
+
+            if (vertex2 == UINT32_MAX || data_graph_.neighbors_[vertex2].size() == 0)
+                continue;
             // check whether vertex is exist or not
             if (data_id_to_query_id.find(vertex2) == data_id_to_query_id.end()) {
                 query_v2 = vertex_size++;
                 data_id_to_query_id.insert({vertex2, query_v2});
-                query_graph.AddVertex(vertex2, data_graph_.vertex_label_[vertex2]);
+                query_graph.AddVertex(query_v2, data_graph_.vertex_label_[vertex2]);
+                vertices.push_back(vertex2);
             } else
                 query_v2 = data_id_to_query_id[vertex2];
-            // check whether edge is already exist
-            bool edge_not_exist = true;
-            for (auto &v: query_graph.neighbors_[query_v1]) {
-                if (v == query_v2) {
-                    edge_not_exist = false;
-                    break;
-                }
-            }
-            if (edge_not_exist) {
-                query_graph.AddEdge(query_v1, query_v2, data_graph_.edge_label_[vertex1][vertex2]);
-                ++j;
-            }
 
-            vertex1 = vertex2;
-            query_v1 = query_v2;
+            // check whether edge is already exist
+            query_graph.AddEdge(query_v1, query_v2, 0);
+            if (edges_before == query_graph.edge_nums_)
+                ++delay;
+            edges_before = query_graph.edge_nums_;
         }
-        if (j == edges_num) {
-            query_degree.push_back({(int) queries.size(), (float) edges_num / vertex_size});
+        if (delay < 3) {
+            query_degree.push_back(
+                    {queries.size(), (int) queries.size(), (float) query_graph.edge_nums_ / vertex_size});
             queries.push_back(query_graph);
         }
+
 
     }
     std::sort(query_degree.begin(), query_degree.end());
 
     for (int i = 0; i < query_nums; ++i) {
-        std::string query_path = query_path_prefix_ + "_" + std::to_string(i);
-        queries[i].Dump(query_path);
+        size_t id=query_degree[i].query_id;
+        std::string query_path =
+                query_path_prefix_ + "Q" + std::to_string(queries[id].edge_nums_) + "_" + std::to_string(i);
+        queries[id].Dump(query_path);
     }
 }
 

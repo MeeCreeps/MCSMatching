@@ -15,18 +15,20 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     auto lower = std::lower_bound(neighbors_[src].begin(), neighbors_[src].end(), dst);
     if (lower != neighbors_[src].end() && *lower == dst) return;
     // ordered by id
+
+    size_t distance = std::distance(neighbors_[src].begin(), lower);
     neighbors_[src].insert(lower, dst);
-    size_t distanct = std::distance(neighbors_[src].begin(), lower);
-    edge_label_[src].insert(edge_label_[src].begin() + distanct, label);
+    edge_label_[src].insert(edge_label_[src].begin() + distance, label);
 
 
 #ifdef UNDIRECTED
     lower = std::lower_bound(neighbors_[dst].begin(), neighbors_[dst].end(), src);
     if (lower != neighbors_[dst].end() && *lower == dst) return;
     // ordered by id
-    neighbors_[dst].insert(lower, dst);
-    distanct = std::distance(neighbors_[dst].begin(), lower);
-    edge_label_[dst].insert(edge_label_[dst].begin() + distanct, label);
+
+    distance = std::distance(neighbors_[dst].begin(), lower);
+    neighbors_[dst].insert(lower, src);
+    edge_label_[dst].insert(edge_label_[dst].begin() + distance, label);
 #endif
     edge_nums_++;
     // label started from 0
@@ -34,7 +36,7 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
 }
 
 void Graph::AddVertex(uint32_t vertex, label_type label) {
-    if (vertex > vertex_label_.size()) {
+    if (vertex >= vertex_label_.size()) {
         vertex_label_.resize(vertex + 1, NON_EXIST);
         neighbors_.resize(vertex + 1);
         edge_label_.resize(vertex + 1);
@@ -66,13 +68,14 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
 
     char type;
 
-//    infile >> vertex_nums_ >> edge_nums_;
+
 //    infile >> vertex_label_type_nums_ >> edge_label_type_nums_;
-//    vertex_label_.resize(vertex_nums_);
-//    neighbors_.resize(vertex_nums_);
-//    edge_label_.resize(vertex_nums_);
+    //vertex_label_.resize(vertex_nums_,NON_EXIST);
+    //neighbors_.resize(vertex_nums_);
+    //edge_label_.resize(vertex_nums_);
 
     uint32_t vertex1, vertex2;
+    infile>>vertex1>>vertex2;
     label_type label;
     while (infile >> type) {
         if (type == 'v') {
@@ -80,7 +83,8 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
             AddVertex(vertex1, label);
             // vertex_label_[vertex1] = label;
         } else if (type == 'e') {
-            infile >> vertex1 >> vertex2 >> label;
+            label=0;
+            infile >> vertex1 >> vertex2 ;
             AddEdge(vertex1, vertex2, label);
 
 //            neighbors_[vertex1].push_back(vertex2);
@@ -102,7 +106,7 @@ void Graph::Dump(std::string &graph_path) {
     //first line   vertex nums   edge nums
     output << vertex_nums_ << " " << edge_nums_ << "\n";
     // second line  the size of vertex label , the size of edge label
-    output << vertex_label_type_nums_ << " " << edge_label_type_nums_ << "\n";
+    //output << vertex_label_type_nums_ << " " << edge_label_type_nums_ << "\n";
     for (uint32_t vertex = 0; vertex < vertex_label_.size(); ++vertex) {
         if (vertex_label_[vertex] == NON_EXIST)
             continue;
@@ -112,8 +116,8 @@ void Graph::Dump(std::string &graph_path) {
         for (uint32_t idx = 0; idx < neighbors_[src].size(); ++idx) {
             if (neighbors_[src][idx] == NON_EXIST)
                 continue;
-            output << "e" << src << " " << neighbors_[src][idx] << " "
-                   << edge_label_[src][idx];
+            output << "e"<<" " << src << " " << neighbors_[src][idx] << " "
+                   << edge_label_[src][idx]<<"\n";
         }
     }
     output.close();

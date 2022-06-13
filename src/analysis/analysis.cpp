@@ -39,11 +39,12 @@ void Analysis::Init() {
 void Analysis::Analyze() {
 
     // how many edges are affected in each query graph by single stream uint
-    std::vector<std::vector<uint32_t>> mapped_edge_nums(streaming_.GetSize(),
+    uint32_t size=streaming_.GetSize();
+    std::vector<std::vector<uint32_t>> mapped_edge_nums(size,
                                                         std::vector<uint32_t>(query_graph_.size(), 0));
 
-    std::vector<uint32_t> affected_edge_nums(streaming_.GetSize(),0);
-    for (int i = 0; i < streaming_.GetSize(); ++i) {
+    std::vector<uint32_t> affected_edge_nums(size,0);
+    for (int i = 0; i < size; ++i) {
         auto uint = streaming_.Front();
         streaming_.Pop();
         triple t{uint.src_label,uint.dst_label,uint.edge_label};
