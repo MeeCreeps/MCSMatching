@@ -59,7 +59,7 @@ public:
     };
 
     std::vector<label_type> GetNeighborLabels(uint32_t vertex) {
-
+        return std::vector<label_type >();
     };
 
 

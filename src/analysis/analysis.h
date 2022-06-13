@@ -31,7 +31,7 @@ protected:
 
         bool operator==(const triple &rhs) const {
             return edge_label == rhs.edge_label && ((v1_label == rhs.v1_label && v2_label == rhs.v2_label) ||
-                                                    (v1_label == rhs.v2_label && v1_label == rhs.v2_label));
+                                                    (v1_label == rhs.v2_label && v2_label == rhs.v1_label));
         }
     };
 
@@ -46,7 +46,7 @@ protected:
     std::vector<Graph> &query_graph_;
     Streaming &streaming_;
     std::string report_path_;
-    std::unordered_multimap<triple, std::pair<uint32_t, uint32_t>, triple_hash> type_to_graph_edge_;
+    std::unordered_map<triple, std::vector<std::pair<uint32_t, uint32_t>>, triple_hash> triple_to_graph_edge_;
 
 };
 
