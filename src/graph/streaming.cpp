@@ -35,9 +35,6 @@ void Streaming::LoadStreamFromFile(std::string &stream_path) {
     if (!infile.good())
         return;
 
-    uint32_t stream_size;
-    infile >> stream_size;
-
     char type;
     while (infile >> type) {
         StreamUint uint;

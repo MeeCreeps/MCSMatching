@@ -75,7 +75,6 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
     //edge_label_.resize(vertex_nums_);
 
     uint32_t vertex1, vertex2;
-    infile>>vertex1>>vertex2;
     label_type label;
     while (infile >> type) {
         if (type == 'v') {
@@ -84,12 +83,11 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
             // vertex_label_[vertex1] = label;
         } else if (type == 'e') {
             label=0;
-            infile >> vertex1 >> vertex2 ;
+            infile >> vertex1 >> vertex2 >>label;
             AddEdge(vertex1, vertex2, label);
 
 //            neighbors_[vertex1].push_back(vertex2);
 //            edge_label_[vertex1].push_back(label);
-
 //            neighbors_[vertex2].push_back(vertex1);
 //            edge_label_[vertex2].push_back(label);
 

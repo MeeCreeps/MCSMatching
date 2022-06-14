@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <unordered_map>
-
+#include "matching-algo/motif/motif_matching.h"
 
 class Analysis {
 

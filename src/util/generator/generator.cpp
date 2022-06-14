@@ -94,7 +94,8 @@ void Generator::GenerateQueries(int query_nums, QueryLimit limit) {
             vertex1 = vertices[rand() % vertices.size()];
             query_v1 = data_id_to_query_id[vertex1];
             // visit neighbor
-            vertex2 = data_graph_.neighbors_[vertex1][rand() % data_graph_.neighbors_[vertex1].size()];
+            int v_idx = rand() % data_graph_.neighbors_[vertex1].size();
+            vertex2 = data_graph_.neighbors_[vertex1][v_idx];
             if (vertex1 == vertex2) {
                 delay++;
                 continue;
@@ -112,7 +113,7 @@ void Generator::GenerateQueries(int query_nums, QueryLimit limit) {
                 query_v2 = data_id_to_query_id[vertex2];
 
             // check whether edge is already exist
-            query_graph.AddEdge(query_v1, query_v2, 0);
+            query_graph.AddEdge(query_v1, query_v2, data_graph_.edge_label_[vertex1][v_idx]);
             if (edges_before == query_graph.edge_nums_)
                 ++delay;
             edges_before = query_graph.edge_nums_;

@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     CLI::App app{"multi queries over streaming "};
 
 
-    bool is_generate = true, is_analyze = false ;
+    bool is_generate = false, is_analyze = false ;
     std::string query_graph_dir, stream_path, data_graph_path, original_data_path, report_path;
     app.add_option("-d", data_graph_path, "data graph ")->required();
     app.add_option("-q", query_graph_dir, "directory of queries")->required();
@@ -61,7 +61,8 @@ int main(int argc, char **argv) {
             std::string query_graph_path=query_graph_dir+std::string(dp->d_name);
             Graph query_graph;
             query_graph.LoadGraphByFile(query_graph_path);
-            queries.push_back(query_graph);
+            if(query_graph.GetEdgeNum()>0)
+                queries.push_back(query_graph);
 
         }
         closedir(dir);
