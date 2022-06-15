@@ -42,11 +42,18 @@ protected:
         }
     };
 
+    struct key_equal{
+
+        bool operator()(const triple& lhs,const triple &rhs) const{
+            return lhs==rhs;
+        }
+
+    };
     Graph &data_graph_;
     std::vector<Graph> &query_graph_;
     Streaming &streaming_;
     std::string report_path_;
-    std::unordered_map<triple, std::vector<std::pair<uint32_t, uint32_t>>, triple_hash> triple_to_graph_edge_;
+    std::unordered_map<triple, std::vector<std::pair<uint32_t, uint32_t>>, triple_hash,key_equal> triple_to_graph_edge_;
 
 };
 

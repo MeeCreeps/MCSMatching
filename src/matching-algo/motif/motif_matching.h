@@ -18,6 +18,7 @@
 class MotifMatching: public Matching{
 
 public:
+    virtual  void Init();
 
 
 private:

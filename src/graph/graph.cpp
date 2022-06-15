@@ -21,18 +21,18 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     edge_label_[src].insert(edge_label_[src].begin() + distance, label);
 
 
-#ifdef UNDIRECTED
+
     lower = std::lower_bound(neighbors_[dst].begin(), neighbors_[dst].end(), src);
     if (lower != neighbors_[dst].end() && *lower == dst) return;
     // ordered by id
-
     distance = std::distance(neighbors_[dst].begin(), lower);
     neighbors_[dst].insert(lower, src);
     edge_label_[dst].insert(edge_label_[dst].begin() + distance, label);
-#endif
+
+
     edge_nums_++;
     // label started from 0
-    edge_label_type_nums_ = std::max(edge_label_type_nums_, label + 1);
+    edge_label_size_ = std::max(edge_label_size_, label + 1);
 }
 
 void Graph::AddVertex(uint32_t vertex, label_type label) {
@@ -67,29 +67,15 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
     }
 
     char type;
-
-
-//    infile >> vertex_label_type_nums_ >> edge_label_type_nums_;
-    //vertex_label_.resize(vertex_nums_,NON_EXIST);
-    //neighbors_.resize(vertex_nums_);
-    //edge_label_.resize(vertex_nums_);
-
     uint32_t vertex1, vertex2;
     label_type label;
     while (infile >> type) {
         if (type == 'v') {
             infile >> vertex1 >> label;
             AddVertex(vertex1, label);
-            // vertex_label_[vertex1] = label;
         } else if (type == 'e') {
-            label=0;
             infile >> vertex1 >> vertex2 >>label;
             AddEdge(vertex1, vertex2, label);
-
-//            neighbors_[vertex1].push_back(vertex2);
-//            edge_label_[vertex1].push_back(label);
-//            neighbors_[vertex2].push_back(vertex1);
-//            edge_label_[vertex2].push_back(label);
 
         }
     }
@@ -100,11 +86,7 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
 void Graph::Dump(std::string &graph_path) {
     std::ofstream output(graph_path);
 
-    // v: vertex  e: edge(dst,src,type)
-    //first line   vertex nums   edge nums
-    output << vertex_nums_ << " " << edge_nums_ << "\n";
-    // second line  the size of vertex label , the size of edge label
-    //output << vertex_label_type_nums_ << " " << edge_label_type_nums_ << "\n";
+    // v: vertex label  e: edge(dst,src,label)
     for (uint32_t vertex = 0; vertex < vertex_label_.size(); ++vertex) {
         if (vertex_label_[vertex] == NON_EXIST)
             continue;

@@ -14,7 +14,7 @@
 void Streaming::Dump(std::string &stream_path) {
     std::ofstream output(stream_path);
 
-    output << streaming_.size() << "\n";
+
     // format :  i/d  src  src_label  dst dst_label edge_label
     while (!streaming_.empty()) {
         Streaming::StreamUint operate = streaming_.front();
