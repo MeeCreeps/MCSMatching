@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "subgraphmatching/matching.h"
+#include "matching-algo/matching.h"
 #include "analysis/analysis.h"
 #include "util/CLI11.hpp"
 #include "util/generator/generator.h"
@@ -45,11 +45,11 @@ int main(int argc, char **argv) {
     }
 
     std::cout<<"load  data graph"<<std::endl;
-    Graph data_graph;
-    data_graph.LoadGraphByFile(data_graph_path);
+    Graph* data_graph = new Mgraph();
+    data_graph->LoadGraphByFile(data_graph_path);
 
     std::cout<<"load  query graphs"<<std::endl;
-    std::vector<Graph> queries;
+    std::vector<Graph*> queries;
     {
         DIR *dir;
         struct dirent *dp;
@@ -59,9 +59,9 @@ int main(int argc, char **argv) {
         }
         while ((dp = readdir(dir)) != NULL) {
             std::string query_graph_path=query_graph_dir+std::string(dp->d_name);
-            Graph query_graph;
-            query_graph.LoadGraphByFile(query_graph_path);
-            if(query_graph.GetEdgeNum()>0)
+            Graph* query_graph = new Mgraph();
+            query_graph->LoadGraphByFile(query_graph_path);
+            if(query_graph->GetEdgeNum()>0)
                 queries.push_back(query_graph);
 
         }
@@ -79,7 +79,11 @@ int main(int argc, char **argv) {
         Analysis *analysis = new Analysis(data_graph,queries,streaming,report_path);
         analysis->Init();
         analysis->Analyze();
+        delete analysis;
     }
+    delete data_graph;
+    for(auto q:queries)
+        delete q;
 }
 
 

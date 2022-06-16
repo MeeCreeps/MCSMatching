@@ -21,7 +21,6 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     edge_label_[src].insert(edge_label_[src].begin() + distance, label);
 
 
-
     lower = std::lower_bound(neighbors_[dst].begin(), neighbors_[dst].end(), src);
     if (lower != neighbors_[dst].end() && *lower == dst) return;
     // ordered by id
@@ -33,6 +32,14 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     edge_nums_++;
     // label started from 0
     edge_label_size_ = std::max(edge_label_size_, label + 1);
+
+    if (neighbor_label_distribution_[src].size() < edge_label_size_)
+        neighbor_label_distribution_[src].resize(edge_label_size_, 0);
+    if (neighbor_label_distribution_[dst].size() < edge_label_size_)
+        neighbor_label_distribution_[dst].resize(edge_label_size_, 0);
+    neighbor_label_distribution_[src][label] += 1;
+    neighbor_label_distribution_[dst][label] += 1;
+
 }
 
 void Graph::AddVertex(uint32_t vertex, label_type label) {
@@ -40,6 +47,7 @@ void Graph::AddVertex(uint32_t vertex, label_type label) {
         vertex_label_.resize(vertex + 1, NON_EXIST);
         neighbors_.resize(vertex + 1);
         edge_label_.resize(vertex + 1);
+        neighbor_label_distribution_.resize(vertex + 1);
 
     }
     if (vertex_label_[vertex] == NON_EXIST) {
@@ -74,11 +82,15 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
             infile >> vertex1 >> label;
             AddVertex(vertex1, label);
         } else if (type == 'e') {
-            infile >> vertex1 >> vertex2 >>label;
+            infile >> vertex1 >> vertex2 >> label;
             AddEdge(vertex1, vertex2, label);
 
         }
     }
+    // for sake of coding easily , needed to be changed later .
+    for (auto &dis: neighbor_label_distribution_)
+        dis.resize(edge_label_size_, 0);
+
     infile.close();
 
 }
@@ -96,8 +108,14 @@ void Graph::Dump(std::string &graph_path) {
         for (uint32_t idx = 0; idx < neighbors_[src].size(); ++idx) {
             if (neighbors_[src][idx] == NON_EXIST)
                 continue;
-            output << "e"<<" " << src << " " << neighbors_[src][idx] << " "
-                   << edge_label_[src][idx]<<"\n";
+#ifdef UNDIRECTED
+            if (src <= neighbors_[src][idx])
+                continue;
+#endif
+
+
+            output << "e" << " " << src << " " << neighbors_[src][idx] << " "
+                   << edge_label_[src][idx] << "\n";
         }
     }
     output.close();

@@ -26,7 +26,7 @@ class Graph {
 
 public:
 
-    struct edge{
+    struct edge {
         uint32_t src;
         uint32_t dst;
     };
@@ -45,9 +45,9 @@ public:
 
     uint32_t GetEdgeNum() { return edge_nums_; };
 
-    uint32_t GetEdgeLabelNums() { return edge_label_type_nums_; }
+    uint32_t GetEdgeLabelNums() { return edge_label_size_; }
 
-    uint32_t GeVertexLabelNums() { return vertex_label_type_nums_; }
+    uint32_t GeVertexLabelNums() { return vertex_label_size_; }
 
     uint32_t GetDegree(uint32_t vertex) { return neighbors_[vertex].size(); }
 
@@ -57,8 +57,10 @@ public:
 
     const std::vector<uint32_t> &GetNeighbors(uint32_t vertex) { return neighbors_[vertex]; };
 
-    const std::vector<label_type> &GetNeighborLabels(uint32_t vertex) { return std::vector<label_type>(); };
+    const std::vector<label_type> &GetNeighborLabels(uint32_t vertex) { return edge_label_[vertex]; };
 
+    const std::vector<size_t> &
+    GetNeighborLabelDistribution(uint32_t vertex) { return neighbor_label_distribution_[vertex]; }
 
     void LoadGraphByFile(std::string &graph_path);
 
@@ -79,6 +81,7 @@ protected:
     // the total number  of types
     uint32_t edge_label_size_;
     uint32_t vertex_label_size_;
+    std::vector<std::vector<size_t>> neighbor_label_distribution_;
     // the number of instance of each type
     std::unordered_map<label_type, size_t> each_edge_label_type_num_;
     std::unordered_map<label_type, size_t> each_vertex_label_type_num_;

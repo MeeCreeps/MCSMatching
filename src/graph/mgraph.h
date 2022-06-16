@@ -28,8 +28,24 @@ public:
 
     void BuildMotif(Motif &m, uint32_t src, uint32_t dst);
 
+    void SetMotif(Motif &m,uint32_t src,uint32_t idx){
+        if(edge_motif_[src].size()<neighbors_[src].size())
+            edge_motif_[src].resize(neighbors_[src].size());
+        edge_motif_[src][idx]=std::move(m);
+    }
+
     const std::vector<Motif> &GetNeighborMotif(uint32_t src) { return edge_motif_[src]; }
 
+    const Motif &GetMotif(uint32_t src, uint32_t dst) { return edge_motif_[src][dst]; }
+
+    void CountTriangle(Motif &m, const std::vector<uint32_t> &neighbor1, const std::vector<uint32_t> &neighbor2,
+                       const std::vector<label_type> &neighbor1_label, const std::vector<label_type> &neighbor2_label);
+
+    void CountStar(Motif &m, const std::vector<uint32_t> &neighbor1, const std::vector<uint32_t> &neighbor2,
+                   const std::vector<size_t> &neighbor1_label_dis, const std::vector<size_t> &neighbor2_label_dis);
+
+    void CountLine(Motif &m, const std::vector<uint32_t> &neighbor1, const std::vector<uint32_t> &neighbor2,
+                   const std::vector<size_t> &neighbor1_label_dis, const std::vector<size_t> &neighbor2_label_dis);
 
 protected:
 
