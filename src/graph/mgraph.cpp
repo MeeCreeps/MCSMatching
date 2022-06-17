@@ -39,6 +39,12 @@ void Mgraph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     edge_nums_++;
     // label started from 0
     edge_label_size_ = std::max(edge_label_size_, label + 1);
+    if (neighbor_label_distribution_[src].size() < edge_label_size_)
+        neighbor_label_distribution_[src].resize(edge_label_size_, 0);
+    if (neighbor_label_distribution_[dst].size() < edge_label_size_)
+        neighbor_label_distribution_[dst].resize(edge_label_size_, 0);
+    neighbor_label_distribution_[src][label] += 1;
+    neighbor_label_distribution_[dst][label] += 1;
 }
 
 void Mgraph::RemoveEdge(uint32_t src, uint32_t dst) {

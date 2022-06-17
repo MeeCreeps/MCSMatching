@@ -5,7 +5,7 @@ project(MultiSubgraphMatching CXX)
 
 
 set(GTEST_INCLUDE src/include/thirdpart)
-add_subdirectory(./src/include/thirdpart/googletest)
+#add_subdirectory(./src/include/thirdpart/googletest)
 include_directories(src)
 
 
