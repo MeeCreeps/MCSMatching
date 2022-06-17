@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
         std::cout<<"start analyze "<<std::endl;
         Analysis *analysis = new Analysis(data_graph,queries,streaming,report_path);
         analysis->Init();
+        std::cout<<"initial finished "<<std::endl;
         analysis->Analyze();
         delete analysis;
     }

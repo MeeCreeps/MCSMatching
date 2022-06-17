@@ -65,7 +65,7 @@ void Analysis::Analyze() {
     for (int i = 0; i < size; ++i) {
         auto uint = streaming_.Front();
         streaming_.Pop();
-
+        std::cout<<"streaming :"<<i<<std::endl;
         ((Mgraph *)data_graph_)->AddEdge(uint.src, uint.dst, uint.edge_label);
         // data motif
         const Motif &m = ((Mgraph *) data_graph_)->GetMotif(uint.src, uint.dst);
