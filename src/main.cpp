@@ -12,6 +12,8 @@
 #include "analysis/analysis.h"
 #include "util/CLI11.hpp"
 #include "util/generator/generator.h"
+#include "matching-algo/motif/motif.h"
+
 
 #include <iostream>
 #include <sys/types.h>
