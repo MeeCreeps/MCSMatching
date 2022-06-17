@@ -16,10 +16,12 @@ class Motif {
 public:
     Motif() = default;
 
-    Motif(size_t edge_label_size) : label_nums_(edge_label_size), size_(edge_label_size * (edge_label_size + 1) / 2) {
-        line_.resize(size_, 0);
-        triangle_.resize(size_, 0);
-        star_.resize(size_, 0);
+    Motif(size_t edge_label_size) : label_nums_(edge_label_size) {
+        for(size_t i=0;i<edge_label_size;++i){
+            line_.push_back(std::vector<int>(edge_label_size-i,0));
+            star_.push_back(std::vector<int>(edge_label_size-i,0));
+            triangle_.push_back(std::vector<int>(edge_label_size-i,0));
+        }
     }
 
     struct Edge {
@@ -31,21 +33,17 @@ public:
 
 
     virtual bool IsSatisfied(const Motif &rhs) const {
-        for (int i = 0; i < size_; ++i) {
-            if (line_[i] < rhs.line_[i])
-                return false;
-        }
-        for (int i = 0; i < size_; ++i) {
-            if (star_[i] < rhs.star_[i])
-                return false;
-        }
-        for (int i = 0; i < size_; ++i) {
-            if (triangle_[i] < rhs.star_[i])
-                return false;
+        for (int i = 0; i < rhs.line_.size(); ++i) {
+            for (int j = 0; j < rhs.line_[i].size(); ++j) {
+                if (line_[i][j] < rhs.line_[i][j] || star_[i][j] < rhs.star_[i][j] ||
+                    triangle_[i][j] < rhs.triangle_[i][j])
+                    return false;
+            }
         }
         return true;
     };
 
+    // expired
     size_t GetMotifIdx(label_type l1, label_type l2) {
         if (l1 < l2)
             return label_nums_ * l1 - l1 * (l1 - 1) / 2 + l2 - l1;
@@ -54,24 +52,30 @@ public:
 
     }
 
-    void AddStar(label_type l1, label_type l2,int num) {
-        star_[GetMotifIdx(l1, l2)] += num;
+    void AddStar(label_type l1, label_type l2, int num) {
+        star_[l1][l2 - l1] += num;
     }
 
-    void AddTriangle(label_type l1, label_type l2,int num) { triangle_[GetMotifIdx(l1, l2)] += num; }
+    void AddTriangle(label_type l1, label_type l2, int num) {
 
-    void AddLine(label_type l1, label_type l2,int num) { line_[GetMotifIdx(l1, l2)] += num; }
+        triangle_[l1][l2 - l1] += num;
+    }
+
+    // l1 < l2
+    void AddLine(label_type l1, label_type l2, int num) {
+        line_[l1][l2 - l1] += num;
+    }
 
     //Edge GetEdge() { return edge_; };
 
 
 protected:
     //Edge edge_;
-    size_t size_;
     size_t label_nums_;
-    std::vector<int> line_;
-    std::vector<int> star_;
-    std::vector<int> triangle_;
+    // 4 types , we need to travasal 2 step to build fourth type , inefficient
+    std::vector<std::vector<int>> line_;
+    std::vector<std::vector<int>> star_;
+    std::vector<std::vector<int>> triangle_;
 
 };
 
