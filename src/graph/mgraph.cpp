@@ -87,7 +87,10 @@ Mgraph::CountTriangle(Motif &m, const std::vector<uint32_t> &neighbor1, const st
         else if (neighbor1[i] > neighbor2[j])
             ++j;
         else {
-            m.AddTriangle(neighbor1_label[i], neighbor2_label[j], 1);
+            if(neighbor1_label[i]>neighbor2_label[j])
+                m.AddTriangle( neighbor2_label[j],neighbor1_label[i], 1);
+            else
+                m.AddTriangle(neighbor1_label[i], neighbor2_label[j], 1);
             ++j;
             ++i;
         }
