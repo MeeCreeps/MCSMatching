@@ -91,18 +91,12 @@ public:
 
 protected:
     //Edge edge_;
-    struct HashPair{
 
-        size_t operator()(const std::pair<label_type ,label_type > &p) const {
-            return std::hash<label_type >{}(p.first) ^ std::hash<label_type >{}(p.second);
-        }
-
-    };
     size_t label_nums_;
     // 4 types , we need to travasal 2 step to build fourth type , inefficient
-    std::unordered_map<std::pair<label_type,label_type>,int,HashPair> line_;
-    std::unordered_map<std::pair<label_type,label_type>,int,HashPair> star_;
-    std::unordered_map<std::pair<label_type,label_type>,int,HashPair> triangle_;
+    std::unordered_map<std::pair<label_type,label_type>,int,pair_hash> line_;
+    std::unordered_map<std::pair<label_type,label_type>,int,pair_hash> star_;
+    std::unordered_map<std::pair<label_type,label_type>,int,pair_hash> triangle_;
 
 
 };
