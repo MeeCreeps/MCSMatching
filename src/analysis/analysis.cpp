@@ -10,9 +10,20 @@
 
 #include "analysis.h"
 
-void Analysis::Init() {
+void Analysis::BuildDataMotif() {
+    // build motif of  data graph
+    for (int v1 = 0; v1 < data_graph_->vertex_nums_; ++v1) {
+        for (int n = 0; n < data_graph_->neighbors_[v1].size(); ++n) {
+            uint32_t v2 = data_graph_->neighbors_[v1][n];
+            if (v1 > v2)
+                continue;
+            ((Mgraph *) data_graph_)->BuildMotif(v1, v2, data_graph_->edge_label_[v1][n]);
+        }
+    }
+}
+
+void Analysis::BuildQueryMotif() {
     // build the index that mapping triple to query edge
-    uint32_t edge_idx = 0;
     for (int i = 0; i < query_graph_.size(); ++i) {
         for (int v1 = 0; v1 < query_graph_[i]->vertex_nums_; ++v1) {
             for (int n = 0; n < query_graph_[i]->neighbors_[v1].size(); ++n) {
@@ -23,7 +34,7 @@ void Analysis::Init() {
                 triple t(query_graph_[i]->vertex_label_[v1], query_graph_[i]->vertex_label_[v2],
                          query_graph_[i]->edge_label_[v1][n]);
                 std::tuple<uint32_t, uint32_t, uint32_t> p{i, v1, v2};
-                ++edge_idx;
+
                 auto iter = triple_to_graph_edge_.find(t);
                 if (iter != triple_to_graph_edge_.end())
                     iter->second.push_back(p);
@@ -35,16 +46,53 @@ void Analysis::Init() {
             }
         }
     }
+}
 
-    // build motif of  data graph
-    for (int v1 = 0; v1 < data_graph_->vertex_nums_; ++v1) {
-        for (int n = 0; n < data_graph_->neighbors_[v1].size(); ++n) {
-            uint32_t v2 = data_graph_->neighbors_[v1][n];
-            if (v1 > v2)
-                continue;
-            ((Mgraph *) data_graph_)->BuildMotif(v1, v2, data_graph_->edge_label_[v1][n]);
+void Analysis::CountMaximalMotif() {
+    for (int i = 0; i < query_graph_.size(); ++i) {
+        for (int v1 = 0; v1 < query_graph_[i]->vertex_nums_; ++v1) {
+            for (int n = 0; n < query_graph_[i]->neighbors_[v1].size(); ++n) {
+                uint32_t v2 = query_graph_[i]->neighbors_[v1][n];
+                if (v1 > v2)
+                    continue;
+                auto &src_motif = ((Mgraph *) query_graph_[i])->GetMotif(v1, v2).GetSrcTriple();
+                auto &dst_motif = ((Mgraph *) query_graph_[i])->GetMotif(v1, v2).GetSrcTriple();
+                auto &triangle_motif = ((Mgraph *) query_graph_[i])->GetMotif(v1, v2).GetTriangle();
+                for (auto &kv: src_motif) {
+                    neighbor_motif_.insert(kv.first);
+                }
+                for (auto &kv: dst_motif)
+                    neighbor_motif_.insert(kv.first);
+                for (auto &kv: triangle_motif)
+                    triangle_motif_.insert(kv.first);
+
+
+            }
         }
+#ifdef LOGGING
+        LOG(INFO) << " maximal query motif  size\n";
+        LOG(INFO) << " neighbor motif size : "<<neighbor_motif_.size()<<"\n";
+        LOG(INFO) << " triangle motif size : "<<triangle_motif_.size()<<"\n";
+
+#endif
     }
+}
+
+
+void Analysis::Init() {
+    BuildQueryMotif();
+#ifdef LOGGING
+    LOG(INFO) << " build query motif finished \n";
+#endif
+    CountMaximalMotif();
+
+    BuildDataMotif();
+
+
+#ifdef LOGGING
+    LOG(INFO) << " build data graph motif finished \n";
+#endif
+
 }
 
 
@@ -65,8 +113,8 @@ void Analysis::Analyze() {
         streaming_.Pop();
 
         // data motif
-        if(uint.src>uint.dst)
-            std::swap(uint.dst,uint.src);
+        if (uint.src > uint.dst)
+            std::swap(uint.dst, uint.src);
         // must add edge first
         ((Mgraph *) data_graph_)->AddEdge(uint.src, uint.dst, uint.edge_label);
         const Motif &m1 = ((Mgraph *) data_graph_)->BuildMotif(uint.src, uint.dst, uint.edge_label);
@@ -105,5 +153,8 @@ void Analysis::Analyze() {
     }
     output.close();
 }
+
+
+
 
 

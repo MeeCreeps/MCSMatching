@@ -112,6 +112,7 @@ public:
         return dst_triple_;
     }
 
+    std::unordered_map<std::tuple<label_type, label_type, label_type>, int, tuple_hash> &GetTriangle(){return triangle_;}
 protected:
 
     // in undirected data graph , id(u)<id(v)

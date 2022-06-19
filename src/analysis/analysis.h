@@ -4,12 +4,12 @@
 
 #include "graph/graph.h"
 #include "graph/streaming.h"
-
+#include "matching-algo/motif/motif_matching.h"
+#include "graph/mgraph.h"
 
 #include <vector>
 #include <unordered_map>
-#include "matching-algo/motif/motif_matching.h"
-#include "graph/mgraph.h"
+#include <unordered_set>
 
 class Analysis {
 
@@ -23,6 +23,14 @@ public:
     void Init();
 
     void Analyze();
+
+    void BuildQueryMotif();
+
+    void BuildDataMotif();
+
+    void CountMaximalMotif();
+
+
 
 protected:
     struct triple {
@@ -67,7 +75,8 @@ protected:
     Streaming &streaming_;
     std::string report_path_;
     std::unordered_map<triple, std::vector<std::tuple<uint32_t,uint32_t,uint32_t>>, triple_hash, key_equal> triple_to_graph_edge_;
-
+    std::unordered_set<std::pair<label_type,label_type>,pair_hash> neighbor_motif_;
+    std::unordered_set<std::tuple<label_type,label_type,label_type>,tuple_hash> triangle_motif_;
 };
 
 
