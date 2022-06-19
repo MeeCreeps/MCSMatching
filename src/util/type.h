@@ -15,8 +15,9 @@ typedef uint32_t label_type;
 
 #define NON_EXIST UINT32_MAX
 #include <utility>
+
 #include "easylogging++.h"
-INITIALIZE_EASYLOGGINGPP
+//INITIALIZE_EASYLOGGINGPP
 
 struct QueryLimit{
     int max_edge_nums;

@@ -22,7 +22,6 @@
 #include "util/type.h"
 #include <unordered_map>
 
-#include "include/thirdpart/easylog/easylogging++.h"
 
 class Graph {
 
