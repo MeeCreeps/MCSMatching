@@ -117,7 +117,7 @@ void Analysis::Analyze() {
             std::swap(uint.dst, uint.src);
         // must add edge first
         ((Mgraph *) data_graph_)->AddEdge(uint.src, uint.dst, uint.edge_label);
-        const Motif &m1 = ((Mgraph *) data_graph_)->BuildMotif(uint.src, uint.dst, uint.edge_label);
+        const Motif &m1 = ((Mgraph *) data_graph_)->UpdateMotif(uint.src, uint.dst, uint.edge_label);
 
 
         // query graph motif contains

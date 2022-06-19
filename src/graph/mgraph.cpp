@@ -11,7 +11,6 @@
 #include "mgraph.h"
 
 
-
 void Mgraph::RemoveEdge(uint32_t src, uint32_t dst) {
     Graph::RemoveEdge(src, dst);
 }
@@ -28,7 +27,8 @@ void Mgraph::RemoveVertex(uint32_t vertex) {
 
 const Motif &Mgraph::BuildMotif(uint32_t src, uint32_t dst, label_type label) {
 
-
+    if (edge_motif_[src].size() < neighbors_[src].size())
+        edge_motif_[src].resize(neighbors_.size(), Motif());
     Motif &m = GetMotif(src, dst);
 
     const std::vector<uint32_t> &s_neighbor = GetNeighbors(src);
@@ -47,10 +47,12 @@ const Motif &Mgraph::BuildMotif(uint32_t src, uint32_t dst, label_type label) {
 
     CountNeighborDis(m, d_edge_label, d_neighbor_label, {vertex_label_[src], label}, false);
 
-
+    if (edge_motif_[dst].size() < neighbors_[dst].size())
+        edge_motif_[dst].resize(neighbors_.size(), Motif());
     Motif &m2 = GetMotif(dst, src);
     m2 = m;
     return m;
+
 }
 
 const Motif &Mgraph::UpdateMotif(uint32_t src, uint32_t dst, label_type label) {
@@ -62,10 +64,26 @@ const Motif &Mgraph::UpdateMotif(uint32_t src, uint32_t dst, label_type label) {
     const auto &s_neighbor_label = GetNeighborLabels(src);
     const auto &d_neighbor_label = GetNeighborLabels(dst);
 
+    // insert motif
+    auto lower = std::lower_bound(neighbors_[src].begin(), neighbors_[src].end(), dst);
+    size_t distance = std::distance(neighbors_[src].begin(), lower);
+    edge_motif_[src].insert(edge_motif_[src].begin() + distance, Motif());
+    Motif &m = edge_motif_[src][distance];
 
+    m.SetLables(vertex_label_[src], vertex_label_[dst]);
+    // triangle
+    CountTriangle(m, s_neighbor, d_neighbor, s_edge_label, d_edge_label, s_neighbor_label, d_neighbor_label);
+    // update src neighbor distribution
+    CountNeighborDis(m, s_edge_label, s_neighbor_label, {vertex_label_[dst], label}, true);
 
+    CountNeighborDis(m, d_edge_label, d_neighbor_label, {vertex_label_[src], label}, false);
+
+    lower = std::lower_bound(neighbors_[dst].begin(), neighbors_[dst].end(), src);
+    distance = std::distance(neighbors_[dst].begin(), lower);
+    edge_motif_[dst].insert(edge_motif_[dst].begin() + distance, m);
+
+    return m;
 }
-
 
 
 // neighbor is ordered by id
@@ -80,7 +98,7 @@ void Mgraph::CountTriangle(Motif &m, const std::vector<uint32_t> &neighbor1, con
         else if (neighbor1[i] > neighbor2[j])
             ++j;
         else {
-            m.UpdateTriangle(edge_label1[i],  neighbor_label1[i],edge_label2[j], 1);
+            m.UpdateTriangle(edge_label1[i], neighbor_label1[i], edge_label2[j], 1);
             ++j;
             ++i;
         }
@@ -88,8 +106,6 @@ void Mgraph::CountTriangle(Motif &m, const std::vector<uint32_t> &neighbor1, con
 
 
 }
-
-
 
 
 void Mgraph::CountNeighborDis(Motif &m, const std::vector<label_type> &edge_label,
@@ -103,20 +119,17 @@ void Mgraph::CountNeighborDis(Motif &m, const std::vector<label_type> &edge_labe
         else
             m.UpdateDst(vertex_l, edge_l, 1);
     }
-    if(is_src)
+    if (is_src)
         // remove duplicate ones
-        m.UpdateSrc(edge_pair.first,edge_pair.second,-1);
+        m.UpdateSrc(edge_pair.first, edge_pair.second, -1);
     else
-        m.UpdateDst(edge_pair.first,edge_pair.second,-1);
+        m.UpdateDst(edge_pair.first, edge_pair.second, -1);
 }
 
 
 Motif &Mgraph::GetMotif(uint32_t src, uint32_t dst) {
-
     auto lower = std::lower_bound(neighbors_[src].begin(), neighbors_[src].end(), dst);
     size_t distance = std::distance(neighbors_[src].begin(), lower);
-    if (edge_motif_[src].size() < neighbors_[src].size())
-        edge_motif_[src].insert(edge_motif_[src].begin()+distance,Motif());
     return *(edge_motif_[src].begin() + distance);
 }
 
