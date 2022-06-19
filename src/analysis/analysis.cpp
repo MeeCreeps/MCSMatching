@@ -17,13 +17,15 @@ void Analysis::BuildDataMotif() {
             uint32_t v2 = data_graph_->neighbors_[v1][n];
             if (v1 > v2)
                 continue;
+            LOG(INFO) << " motif : "<<v1<<"-"<<v2<<"  "<<n<<"  "<<data_graph_->neighbors_[v1].size() <<"\n";
             ((Mgraph *) data_graph_)->BuildMotif(v1, v2, data_graph_->edge_label_[v1][n]);
         }
-#ifdef LOGGING
+
         if(v1%100==0){
             LOG(INFO) << " build data motif : "<<v1 <<"\n";
 
         }
+#ifdef LOGGING
 #endif
 
     }

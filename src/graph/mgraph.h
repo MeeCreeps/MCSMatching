@@ -25,11 +25,10 @@ public:
 
     void RemoveEdge(uint32_t src, uint32_t dst) override;
 
-    void AddVertex(uint32_t vertex, label_type label) override;
 
     void RemoveVertex(uint32_t vertex) override;
 
-
+    void LoadGraphByFile(std::string &graph_path) override;
     const Motif &BuildMotif(uint32_t src, uint32_t dst, label_type label);
     // edge update first
     const Motif &UpdateMotif(uint32_t src, uint32_t dst, label_type label);

@@ -15,22 +15,14 @@ void Mgraph::RemoveEdge(uint32_t src, uint32_t dst) {
     Graph::RemoveEdge(src, dst);
 }
 
-void Mgraph::AddVertex(uint32_t vertex, label_type label) {
-    if (vertex >= vertex_label_.size())
-        edge_motif_.resize(vertex + 1);
-    Graph::AddVertex(vertex, label);
-}
-
 void Mgraph::RemoveVertex(uint32_t vertex) {
     Graph::RemoveVertex(vertex);
 }
 
 const Motif &Mgraph::BuildMotif(uint32_t src, uint32_t dst, label_type label) {
 
-    if (edge_motif_[src].size() < neighbors_[src].size())
-        edge_motif_[src].resize(neighbors_.size(), Motif());
-    Motif &m = GetMotif(src, dst);
 
+    Motif &m = GetMotif(src, dst);
     const std::vector<uint32_t> &s_neighbor = GetNeighbors(src);
     const std::vector<uint32_t> &d_neighbor = GetNeighbors(dst);
     const auto &s_edge_label = GetEdgeLabels(src);
@@ -47,8 +39,6 @@ const Motif &Mgraph::BuildMotif(uint32_t src, uint32_t dst, label_type label) {
 
     CountNeighborDis(m, d_edge_label, d_neighbor_label, {vertex_label_[src], label}, false);
 
-    if (edge_motif_[dst].size() < neighbors_[dst].size())
-        edge_motif_[dst].resize(neighbors_.size(), Motif());
     Motif &m2 = GetMotif(dst, src);
     m2 = m;
     return m;
@@ -131,6 +121,36 @@ Motif &Mgraph::GetMotif(uint32_t src, uint32_t dst) {
     auto lower = std::lower_bound(neighbors_[src].begin(), neighbors_[src].end(), dst);
     size_t distance = std::distance(neighbors_[src].begin(), lower);
     return *(edge_motif_[src].begin() + distance);
+}
+
+void Mgraph::LoadGraphByFile(std::string &graph_path) {
+    std::ifstream infile(graph_path);
+    if (!infile.good()) {
+        std::cout << "graph file doesn't exist ! " << std::endl;
+        return;
+    }
+
+    char type;
+    uint32_t vertex1, vertex2;
+    label_type label;
+    while (infile >> type) {
+        if (type == 'v') {
+            infile >> vertex1 >> label;
+            AddVertex(vertex1, label);
+        } else if (type == 'e') {
+            infile >> vertex1 >> vertex2 >> label;
+            AddEdge(vertex1, vertex2, label);
+
+        }
+    }
+    // for sake of coding easily , needed to be changed later .
+    edge_motif_.resize(vertex_nums_);
+    for(int i=0;i<vertex_nums_;++i){
+        edge_motif_[i].resize(neighbors_[i].size(),Motif());
+    }
+
+
+    infile.close();
 }
 
 

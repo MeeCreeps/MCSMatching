@@ -65,7 +65,7 @@ public:
 
     const std::vector<label_type> &GetNeighborLabels(uint32_t vertex) { return neighbors_label_[vertex]; };
 
-    void LoadGraphByFile(std::string &graph_path);
+    virtual void LoadGraphByFile(std::string &graph_path);
 
 
     void Dump(std::string &graph_path);

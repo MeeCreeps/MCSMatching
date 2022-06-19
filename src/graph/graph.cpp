@@ -59,7 +59,7 @@ void Graph::RemoveEdge(uint32_t src, uint32_t dst) {
 }
 
 
-void Graph::LoadGraphByFile(std::string &graph_path) {
+ void Graph::LoadGraphByFile(std::string &graph_path) {
 
     std::ifstream infile(graph_path);
     if (!infile.good()) {
