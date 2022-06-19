@@ -13,7 +13,8 @@
 #include "util/CLI11.hpp"
 #include "util/generator/generator.h"
 
-
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
 #include <iostream>
 #include <sys/types.h>

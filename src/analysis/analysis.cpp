@@ -19,6 +19,13 @@ void Analysis::BuildDataMotif() {
                 continue;
             ((Mgraph *) data_graph_)->BuildMotif(v1, v2, data_graph_->edge_label_[v1][n]);
         }
+#ifdef LOGGING
+        if(v1%100==0){
+            LOG(INFO) << " build data motif : "<<v1 <<"\n";
+
+        }
+#endif
+
     }
 }
 
@@ -69,13 +76,15 @@ void Analysis::CountMaximalMotif() {
 
             }
         }
+    }
 #ifdef LOGGING
-        LOG(INFO) << " maximal query motif  size\n";
+    LOG(INFO) << " maximal query motif  size\n";
         LOG(INFO) << " neighbor motif size : "<<neighbor_motif_.size()<<"\n";
         LOG(INFO) << " triangle motif size : "<<triangle_motif_.size()<<"\n";
 
 #endif
-    }
+
+
 }
 
 

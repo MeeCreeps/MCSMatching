@@ -17,7 +17,6 @@ typedef uint32_t label_type;
 #include <utility>
 
 #include "easylogging++.h"
-//INITIALIZE_EASYLOGGINGPP
 
 struct QueryLimit{
     int max_edge_nums;
