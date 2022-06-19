@@ -19,7 +19,9 @@
 class Mgraph : public Graph {
 
 public:
-    void AddEdge(uint32_t src, uint32_t dst, label_type label) override;
+
+
+
 
     void RemoveEdge(uint32_t src, uint32_t dst) override;
 
@@ -28,7 +30,9 @@ public:
     void RemoveVertex(uint32_t vertex) override;
 
 
-    const Motif &BuildMotif(uint32_t src, uint32_t dst,label_type label);
+    const Motif &BuildMotif(uint32_t src, uint32_t dst, label_type label);
+    // edge update first
+    const Motif &UpdateMotif(uint32_t src, uint32_t dst, label_type label);
 
     //const Motif &UpdateAndGetMotif(uint32_t src, uint32_t dst);
 
@@ -40,13 +44,11 @@ public:
     Motif &GetMotif(uint32_t src, uint32_t dst);
 
     void CountTriangle(Motif &m, const std::vector<uint32_t> &neighbor1, const std::vector<uint32_t> &neighbor2,
-                       const std::vector<label_type> &neighbor1_label, const std::vector<label_type> &neighbor2_label);
+                       const std::vector<label_type> &edge_label1, const std::vector<label_type> &edge_label2,
+                       const std::vector<label_type> &neighbor_label1, const std::vector<label_type> &neighbor_label2);
 
-    void CountStar(Motif &m, const std::vector<uint32_t> &neighbor1, const std::vector<uint32_t> &neighbor2,
-                   const std::vector<size_t> &neighbor1_label_dis, const std::vector<size_t> &neighbor2_label_dis,label_type label);
-
-    void CountLine(Motif &m, const std::vector<uint32_t> &neighbor1, const std::vector<uint32_t> &neighbor2,
-                   const std::vector<size_t> &neighbor1_label_dis, const std::vector<size_t> &neighbor2_label_dis,label_type label);
+    void CountNeighborDis(Motif &m, const std::vector<label_type> &edge_label,
+                   const std::vector<label_type> &neighbor_label,std::pair<label_type,label_type> edge_pair,bool is_src);
 
 protected:
 

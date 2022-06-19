@@ -14,7 +14,7 @@
 typedef uint32_t label_type;
 
 #define NON_EXIST UINT32_MAX
-
+#include <utility>
 
 
 struct QueryLimit{
@@ -51,6 +51,13 @@ struct pair_hash {
     std::size_t operator()(const std::pair<T1, T2> &p) const {
         return hash_val(p.first, p.second);
     }
+};
+struct tuple_hash{
+    template <class T1, class T2,class T3>
+    std::size_t operator()(const std::tuple<T1, T2,T3> &t) const {
+        return hash_val(std::get<0>(t),std::get<1>(t),std::get<2>(t));
+    }
+
 };
 
 

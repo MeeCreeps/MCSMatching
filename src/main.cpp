@@ -12,8 +12,6 @@
 #include "analysis/analysis.h"
 #include "util/CLI11.hpp"
 #include "util/generator/generator.h"
-#include "matching-algo/motif/motif.h"
-
 
 #include <iostream>
 #include <sys/types.h>
@@ -80,7 +78,6 @@ int main(int argc, char **argv) {
         std::cout<<"start analyze "<<std::endl;
         Analysis *analysis = new Analysis(data_graph,queries,streaming,report_path);
         analysis->Init();
-        std::cout<<"initial finished "<<std::endl;
         analysis->Analyze();
         delete analysis;
     }

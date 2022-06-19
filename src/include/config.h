@@ -18,7 +18,7 @@
 
 
 constexpr uint32_t STREAMING_SIZE = 10000;
-constexpr uint32_t QUERY_NUMS = 500;
+constexpr uint32_t QUERY_NUMS = 5000;
 constexpr uint32_t QUERY_WALK_SIZE_MIN = 5;
 constexpr uint32_t QUERY_WALK_SIZE_MAX = 15;
 constexpr uint32_t QUERY_GENERATOR_RATE = 5;

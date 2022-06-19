@@ -19,7 +19,7 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     size_t distance = std::distance(neighbors_[src].begin(), lower);
     neighbors_[src].insert(lower, dst);
     edge_label_[src].insert(edge_label_[src].begin() + distance, label);
-
+    neighbors_label_[src].insert(neighbors_label_[src].begin() + distance, vertex_label_[dst]);
 
     lower = std::lower_bound(neighbors_[dst].begin(), neighbors_[dst].end(), src);
     if (lower != neighbors_[dst].end() && *lower == dst) return;
@@ -27,18 +27,12 @@ void Graph::AddEdge(uint32_t src, uint32_t dst, label_type label) {
     distance = std::distance(neighbors_[dst].begin(), lower);
     neighbors_[dst].insert(lower, src);
     edge_label_[dst].insert(edge_label_[dst].begin() + distance, label);
-
+    neighbors_label_[dst].insert(neighbors_label_[dst].begin() + distance, vertex_label_[src]);
 
     edge_nums_++;
     // label started from 0
     edge_label_size_ = std::max(edge_label_size_, label + 1);
 
-    if (neighbor_label_distribution_[src].size() < edge_label_size_)
-        neighbor_label_distribution_[src].resize(edge_label_size_, 0);
-    if (neighbor_label_distribution_[dst].size() < edge_label_size_)
-        neighbor_label_distribution_[dst].resize(edge_label_size_, 0);
-    neighbor_label_distribution_[src][label] += 1;
-    neighbor_label_distribution_[dst][label] += 1;
 
 }
 
@@ -46,9 +40,8 @@ void Graph::AddVertex(uint32_t vertex, label_type label) {
     if (vertex >= vertex_label_.size()) {
         vertex_label_.resize(vertex + 1, NON_EXIST);
         neighbors_.resize(vertex + 1);
+        neighbors_label_.resize(vertex + 1);
         edge_label_.resize(vertex + 1);
-        neighbor_label_distribution_.resize(vertex + 1);
-
     }
     if (vertex_label_[vertex] == NON_EXIST) {
         vertex_label_[vertex] = label;
@@ -88,8 +81,6 @@ void Graph::LoadGraphByFile(std::string &graph_path) {
         }
     }
     // for sake of coding easily , needed to be changed later .
-    for (auto &dis: neighbor_label_distribution_)
-        dis.resize(edge_label_size_, 0);
 
     infile.close();
 
