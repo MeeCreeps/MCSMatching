@@ -14,7 +14,7 @@
 class Analysis {
 
 public:
-    Analysis(Graph *data_graph, std::vector<Graph*> &query_graph, Streaming &streaming, std::string &report_path)
+    Analysis(Graph *data_graph, std::vector<Graph *> &query_graph, Streaming &streaming, std::string &report_path)
             : data_graph_(
             data_graph), query_graph_(query_graph), streaming_(streaming), report_path_(report_path) {
 
@@ -30,7 +30,7 @@ public:
 
     void CountMaximalMotif();
 
-
+    MFilter MotifTest(const Motif &src_m1, const Motif &dst_m1, const Motif &src_m2, const Motif &dst_m2);
 
 protected:
     struct triple {
@@ -74,9 +74,9 @@ protected:
     std::vector<Graph *> &query_graph_;
     Streaming &streaming_;
     std::string report_path_;
-    std::unordered_map<triple, std::vector<std::tuple<uint32_t,uint32_t,uint32_t>>, triple_hash, key_equal> triple_to_graph_edge_;
-    std::unordered_set<std::pair<label_type,label_type>,pair_hash> neighbor_motif_;
-    std::unordered_set<std::tuple<label_type,label_type,label_type>,tuple_hash> triangle_motif_;
+    std::unordered_map<triple, std::vector<std::tuple<uint32_t, uint32_t, uint32_t>>, triple_hash, key_equal> triple_to_graph_edge_;
+    std::unordered_set<std::pair<label_type, label_type>, pair_hash> neighbor_motif_;
+    std::unordered_set<std::tuple<label_type, label_type, label_type>, tuple_hash> triangle_motif_;
 };
 
 

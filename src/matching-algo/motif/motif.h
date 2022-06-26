@@ -12,119 +12,107 @@
 #define MULTISUBGRAPHMATCHING_MOTIF_H
 
 #include <unordered_map>
+#include<set>
+#include<unordered_set>
 
 enum class MFilter {
-    Triangle = 0, Star = 1, False = 3
+     Two_Hop = 0,Star = 1, False = 2
 };
 
 class Motif {
 public:
-    Motif() : src_label_(NON_EXIST), dst_label_(NON_EXIST) {};
 
-    Motif(label_type src_label, label_type dst_label) : src_label_(src_label), dst_label_(dst_label) {};
 
+    Motif(uint32_t v_label_size, uint32_t e_label_size) :
+            v_label_(NON_EXIST), e_label_size_(e_label_size), v_label_size_(v_label_size) { Init(); };
+
+    //Motif(label_type v_label, label_type dst_label) : v_label_(v_label), dst_label_(dst_label) {};
+
+    Motif(label_type v_label, uint32_t v_label_size, uint32_t e_label_size) :
+            v_label_(v_label), e_label_size_(e_label_size), v_label_size_(v_label_size) { Init(); };
+
+
+    void Init() {
+        n1_v_dis_.resize(v_label_size_, 0);
+        n1_e_dis_.resize(e_label_size_, 0);
+        n2_v_dis_.resize(v_label_size_, 0);
+        n2_e_dis_.resize(e_label_size_, 0);
+        dis_idx_.resize(4);
+    }
+
+    void Count2Hop(Motif &rhs) {
+        for (auto i1: rhs.dis_idx_[0]) {
+            this->dis_idx_[2].insert(i1);
+            this->n2_v_dis_[i1] += rhs.n1_v_dis_[i1];
+        }
+        for (auto i2: rhs.dis_idx_[1]) {
+            this->dis_idx_[3].insert(i2);
+            this->n2_e_dis_[i2] += rhs.n1_e_dis_[i2];
+        }
+    }
 
     virtual MFilter IsSatisfied(const Motif &rhs) const {
-
-        // UNDIRECTED and without vertex label
-        MFilter res = IsSatisfiedOneDire(rhs, false);
-#ifdef UNDIRECTED
-        if (res == MFilter::False)
-            return res;
-        else if (rhs.dst_label_ == src_label_ && rhs.src_label_ == dst_label_)
-            return IsSatisfiedOneDire(rhs, true);
-
-#endif
-        return res;
-    };
-
-
-    virtual MFilter IsSatisfiedOneDire(const Motif &rhs, bool is_reverse) const {
-        // Triangle
-        if (!is_reverse) {
-            for (auto &t: rhs.triangle_) {
-                auto iter = triangle_.find(t.first);
-                if (iter == triangle_.end() || t.second > iter->second) {
-                    return MFilter::Triangle;
-                }
-            }
-            // src neighbor
-            for (auto &key: rhs.src_triple_) {
-                auto iter = src_triple_.find(key.first);
-                if (iter == src_triple_.end() || key.second > iter->second)
-                    return MFilter::Star;
-            }
-            for (auto &key: rhs.dst_triple_) {
-                auto iter = dst_triple_.find(key.first);
-                if (iter == dst_triple_.end() || key.second > iter->second)
-                    return MFilter::Star;
-            }
-        } else {
-            for (auto &t: rhs.triangle_) {
-                auto iter = triangle_.find({std::get<2>(t.first), std::get<1>(t.first), std::get<0>(t.first)});
-                if (iter == triangle_.end() || t.second > iter->second) {
-                    return MFilter::Triangle;
-                }
-            }
-            // u neighbor
-            for (auto &key: rhs.src_triple_) {
-                auto iter = dst_triple_.find(key.first);
-                if (iter == dst_triple_.end() || key.second > iter->second)
-                    return MFilter::Star;
-            }
-            for (auto &key: rhs.dst_triple_) {
-                auto iter = src_triple_.find(key.first);
-                if (iter == src_triple_.end() || key.second > iter->second)
-                    return MFilter::Star;
-            }
+        for (auto i: rhs.dis_idx_[0]) {
+            if(this->n1_v_dis_[i]<rhs.n1_v_dis_[i])
+                return MFilter::Star;
+        }
+        for (auto i: rhs.dis_idx_[1]) {
+            if(this->n1_e_dis_[i]<rhs.n1_e_dis_[i])
+                return MFilter::Star;
+        }
+        for (auto i: rhs.dis_idx_[2]) {
+            if(this->n2_v_dis_[i]<rhs.n2_v_dis_[i])
+                return MFilter::Two_Hop;
+        }
+        for (auto i: rhs.dis_idx_[3]) {
+            if(this->n2_e_dis_[i]<rhs.n2_e_dis_[i])
+                return MFilter::Two_Hop;
         }
         return MFilter::False;
-    }
 
-    void SetLables(label_type src_label, label_type dst_label) {
-        src_label_ = src_label;
-        dst_label_ = dst_label;
     };
 
-    void UpdateSrc(label_type vl, label_type el, int num) {
-        src_triple_[{vl, el}] += num;
-        if (num < 0 && src_triple_[{vl, el}] == 0) {
-            src_triple_.erase({vl, el});
+
+    void BuildN1VDis(const std::vector<uint32_t> &neighbors_label) {
+        for (auto l: neighbors_label) {
+            UpdateN1VDIS(l, 1);
         }
     }
 
-    void UpdateDst(label_type vl, label_type el, int num) {
-        dst_triple_[{vl, el}] += num;
-        if (num < 0 && dst_triple_[{vl, el}] == 0) {
-            dst_triple_.erase({vl, el});
+    void BuildN1EDis(const std::vector<uint32_t> &edges_label) {
+        for (auto l: edges_label) {
+            UpdateN1EDIS(l, 1);
         }
     }
 
-    void UpdateTriangle(label_type edge_l1, label_type edge_l2, label_type vl, int num) {
-        triangle_[{edge_l1, edge_l2, vl}] += num;
+    void UpdateN1VDIS(label_type label, uint32_t num) {
+        this->dis_idx_[0].insert(label);
+        this->n1_v_dis_[label] += num;
     }
 
-    std::unordered_map<std::pair<label_type, label_type>, int, pair_hash> &GetSrcTriple() {
-        return src_triple_;
+    void UpdateN1EDIS(label_type label, uint32_t num) {
+        this->dis_idx_[1].insert(label);
+        this->n1_e_dis_[label] += num;
     }
 
-    std::unordered_map<std::pair<label_type, label_type>, int, pair_hash> &GetDstTriple() {
-        return dst_triple_;
-    }
+    void ResetN2Dis(){
+        dis_idx_[2].clear();
+        dis_idx_[3].clear();
+        std::vector<uint32_t>(v_label_size_,0).swap(n2_v_dis_);
+        std::vector<uint32_t>(e_label_size_,0).swap(n2_e_dis_);
 
-    std::unordered_map<std::tuple<label_type, label_type, label_type>, int, tuple_hash> &GetTriangle(){return triangle_;}
+    };
 protected:
-
+    uint32_t e_label_size_;
+    uint32_t v_label_size_;
     // in undirected data graph , id(u)<id(v)
-    label_type src_label_;
-    label_type dst_label_;
+    label_type v_label_;
 
-    std::unordered_map<std::pair<label_type, label_type>, int, pair_hash> src_triple_;
-    std::unordered_map<std::pair<label_type, label_type>, int, pair_hash> dst_triple_;
-    // <E(u,x),x,E(v,x)>
-    std::unordered_map<std::tuple<label_type, label_type, label_type>, int, tuple_hash> triangle_;
-
-
+    std::vector<uint32_t> n1_v_dis_;
+    std::vector<uint32_t> n1_e_dis_;
+    std::vector<uint32_t> n2_v_dis_;
+    std::vector<uint32_t> n2_e_dis_;
+    std::vector<std::unordered_set<int>> dis_idx_;
 };
 
 

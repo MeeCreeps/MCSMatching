@@ -42,10 +42,11 @@ void Graph::AddVertex(uint32_t vertex, label_type label) {
         neighbors_.resize(vertex + 1);
         neighbors_label_.resize(vertex + 1);
         edge_label_.resize(vertex + 1);
+        vertex_nums_=vertex+1;
+        vertex_label_size_=std::max(vertex_label_size_,label+1);
     }
     if (vertex_label_[vertex] == NON_EXIST) {
         vertex_label_[vertex] = label;
-        vertex_nums_++;
     }
 
 }
